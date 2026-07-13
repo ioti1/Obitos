@@ -3182,6 +3182,146 @@ dialog::backdrop { background: rgba(16,32,51,.35); }
   min-width: 96px;
 }
 
+/* Leitura rápida do calendário e orientações da marcação de férias. */
+.month-day.holiday::before,
+.month-day.optional::before {
+  content: none;
+  display: none;
+}
+
+.month-day-heading {
+  width: 100%;
+  min-width: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 4px;
+}
+
+.month-day-heading > strong {
+  flex: 0 0 auto;
+}
+
+.month-day-meta {
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 3px;
+}
+
+.day-type-badge,
+.today-marker {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 17px;
+  border-radius: 999px;
+  padding: 2px 5px;
+  font-size: 9px;
+  font-weight: 800;
+  line-height: 1.15;
+  white-space: nowrap;
+}
+
+.day-type-badge {
+  background: #c97818;
+  color: #fff;
+}
+
+.today-marker {
+  border: 1px solid #0d6f67;
+  background: #e7f6f4;
+  color: #075c55;
+}
+
+.month-day.today {
+  border-color: #0d6f67;
+  box-shadow: 0 0 0 2px rgba(13, 111, 103, .2), 0 0 0 1px #0d6f67 inset;
+}
+
+.month-day.today > .month-day-heading strong {
+  color: #075c55;
+}
+
+.month-day.today.selected,
+.month-day.today.selection-start,
+.month-day.today.selection-end {
+  box-shadow: 0 0 0 2px #0d6f67 inset, 0 0 0 3px rgba(13, 111, 103, .2);
+}
+
+#shortNoticeDialog,
+#vacationSavedGuidanceDialog {
+  width: min(490px, calc(100vw - 32px));
+}
+
+.short-notice-copy,
+.vacation-guidance-copy {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.short-notice-period {
+  color: var(--text);
+  font-weight: 800;
+}
+
+.save-guidance-visual {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 12px 14px;
+  border-left: 4px solid var(--teal);
+  background: #f1f8f7;
+  color: #294b60;
+  line-height: 1.4;
+}
+
+.save-guidance-button {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 7px 12px;
+  border-radius: 6px;
+  background: var(--blue);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.rh-guidance-link {
+  color: #075c55;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+#saveBtn.save-attention {
+  animation: saveAttentionPulse 1.15s ease-in-out 5;
+}
+
+@keyframes saveAttentionPulse {
+  0%, 100% { box-shadow: none; transform: translateY(0); }
+  50% { box-shadow: 0 0 0 5px rgba(255, 196, 61, .45), 0 8px 18px rgba(2, 24, 50, .2); transform: translateY(-1px); }
+}
+
+@media (max-width: 560px) {
+  .month-day-meta {
+    gap: 2px;
+  }
+  .day-type-badge,
+  .today-marker {
+    padding: 2px 4px;
+    font-size: 8px;
+  }
+  .save-guidance-visual {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -3466,6 +3606,38 @@ dialog::backdrop { background: rgba(16,32,51,.35); }
       <div class="dialog-actions vacation-confirm-actions">
         <button id="vacationConfirmRedo" type="button">Não, vou refazer</button>
         <button id="vacationConfirmYes" class="primary" type="button">Sim</button>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="shortNoticeDialog" aria-labelledby="shortNoticeTitle">
+    <div class="dialog-body">
+      <div>
+        <h3 id="shortNoticeTitle">Atenção ao prazo de antecedência</h3>
+        <p class="short-notice-copy">Conforme políticas da Petros, é recomendado agendar as férias com pelo menos 45 dias de antecedência. Deseja seguir com a marcação com período menor?</p>
+      </div>
+      <p id="shortNoticePeriod" class="short-notice-period" role="status" aria-live="polite"></p>
+      <div class="dialog-actions vacation-confirm-actions">
+        <button id="shortNoticeCancel" type="button">Não, voltar</button>
+        <button id="shortNoticeContinue" class="primary" type="button">Sim, seguir</button>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="vacationSavedGuidanceDialog" aria-labelledby="vacationSavedGuidanceTitle">
+    <div class="dialog-body">
+      <div>
+        <h3 id="vacationSavedGuidanceTitle">Período marcado no calendário</h3>
+        <p class="vacation-guidance-copy">Para gravar a alteração no arquivo oficial, selecione <strong>Salvar Excel</strong> no canto superior da aplicação.</p>
+      </div>
+      <div class="save-guidance-visual" aria-label="O botão Salvar Excel fica no canto superior da aplicação">
+        <span>Procure este botão no topo:</span>
+        <span class="save-guidance-button">Salvar Excel</span>
+      </div>
+      <p class="vacation-guidance-copy">Depois de salvar, registre também o período no sistema de RH:</p>
+      <a class="rh-guidance-link" href="https://www.criaresistemas.com/petros/portaldp/" target="_blank" rel="noopener noreferrer">Abrir o Portal DP</a>
+      <div class="dialog-actions">
+        <button id="vacationGuidanceClose" class="primary" type="button">Entendi</button>
       </div>
     </div>
   </dialog>
@@ -5007,13 +5179,17 @@ function canEdit(showMessage = true) {
   function renderDayCard(date, vacationColorMap) {
     const dayIso = iso(date.getFullYear(), date.getMonth(), date.getDate());
     const h = holidayFor(date);
+    const today = new Date();
+    const isToday = date.getFullYear() === today.getFullYear() && date.getMonth() === today.getMonth() && date.getDate() === today.getDate();
     const selected = vacationDraftContains(dayIso);
     const isStart = state.vacationDraftStart === dayIso;
     const isEnd = state.vacationDraftEnd === dayIso;
     const label = h ? h.type : (isWeekend(date) ? "Fim de semana" : "Útil");
     const tooltip = h ? escapeHtml((h.description || label) + " - " + label) : "";
-    return '<button type="button" title="' + escapeHtml(h ? (h.description || label) : label) + '" ' + (tooltip ? 'data-tooltip="' + tooltip + '" ' : '') + 'class="month-day ' + dayClass(date) + (selected ? " selected" : "") + (isStart ? " selection-start" : "") + (isEnd ? " selection-end" : "") + '" data-date="' + dayIso + '">' +
-      '<strong>' + date.getDate() + '</strong>' +
+    const dayTypeBadge = h ? '<span class="day-type-badge">' + escapeHtml(isDayBridgeType(h.type) ? "Dia ponte" : "Feriado") + '</span>' : '';
+    const todayBadge = isToday ? '<span class="today-marker">Hoje</span>' : '';
+    return '<button type="button" title="' + escapeHtml(h ? (h.description || label) : label) + '" ' + (tooltip ? 'data-tooltip="' + tooltip + '" ' : '') + 'class="month-day ' + dayClass(date) + (isToday ? " today" : "") + (selected ? " selected" : "") + (isStart ? " selection-start" : "") + (isEnd ? " selection-end" : "") + '" data-date="' + dayIso + '">' +
+      '<span class="month-day-heading"><strong>' + date.getDate() + '</strong><span class="month-day-meta">' + todayBadge + dayTypeBadge + '</span></span>' +
       dayVacationChips(dayIso, vacationColorMap) +
       '</button>';
   }
@@ -5134,7 +5310,68 @@ function canEdit(showMessage = true) {
     renderCalendar();
     applyAccessMode();
   }
-  function confirmVacationSelection() {
+  let shortNoticeResolver = null;
+
+  function localTodayIso() {
+    const today = new Date();
+    return iso(today.getFullYear(), today.getMonth(), today.getDate());
+  }
+
+  function confirmShortNoticeIfNeeded(start) {
+    const today = localTodayIso();
+    const minimumStart = addDays(today, 45);
+    if (time(start) >= time(minimumStart)) return Promise.resolve(true);
+    const daysAhead = Math.round((time(start) - time(today)) / 86400000);
+    const period = $("shortNoticePeriod");
+    if (period) {
+      period.textContent = daysAhead >= 0
+        ? "Início em " + displayDate(start) + " (" + daysAhead + " dias de antecedência)."
+        : "A data de início, " + displayDate(start) + ", é anterior à data de hoje.";
+    }
+    const dialog = $("shortNoticeDialog");
+    if (!dialog || typeof dialog.showModal !== "function") {
+      return Promise.resolve(window.confirm("Conforme políticas da Petros, é recomendado agendar as férias com pelo menos 45 dias de antecedência. Deseja seguir com a marcação com período menor?"));
+    }
+    return new Promise((resolve) => {
+      shortNoticeResolver = resolve;
+      if (!dialog.open) dialog.showModal();
+    });
+  }
+
+  function resolveShortNotice(proceed) {
+    const dialog = $("shortNoticeDialog");
+    if (dialog && dialog.open) dialog.close();
+    const resolve = shortNoticeResolver;
+    shortNoticeResolver = null;
+    if (resolve) resolve(proceed);
+  }
+
+  function highlightSaveButton() {
+    const button = $("saveBtn");
+    if (!button) return;
+    button.classList.remove("save-attention");
+    void button.offsetWidth;
+    button.classList.add("save-attention");
+    window.setTimeout(() => button.classList.remove("save-attention"), 6500);
+  }
+
+  function showVacationSavedGuidance() {
+    const dialog = $("vacationSavedGuidanceDialog");
+    if (dialog && typeof dialog.showModal === "function") {
+      if (!dialog.open) dialog.showModal();
+      return;
+    }
+    window.alert("Período marcado. Para gravar no arquivo oficial, selecione Salvar Excel no canto superior e depois registre o período no sistema de RH.");
+    highlightSaveButton();
+  }
+
+  function closeVacationSavedGuidance() {
+    const dialog = $("vacationSavedGuidanceDialog");
+    if (dialog && dialog.open) dialog.close();
+    highlightSaveButton();
+  }
+
+  async function confirmVacationSelection() {
     if (!state.vacationSelectionActive || !canEdit()) return;
     const employeeId = state.currentUser.id;
     const start = state.vacationDraftStart;
@@ -5152,12 +5389,14 @@ function canEdit(showMessage = true) {
       $("vacationSelectionEnd").focus();
       return;
     }
-    addVacationRange(employeeId, start, end);
+    if (!(await confirmShortNoticeIfNeeded(start))) return;
+    if (!addVacationRange(employeeId, start, end)) return;
     state.vacationSelectionActive = false;
     clearVacationDraft();
     state.currentEmployeeId = state.currentUser.id;
     saveLocal();
     render();
+    showVacationSavedGuidance();
   }
   function rangesOverlap(startA, endA, startB, endB) {
     return time(startA) <= time(endB) && time(endA) >= time(startB);
@@ -5257,7 +5496,7 @@ function canEdit(showMessage = true) {
     if (dialog && !dialog.open) dialog.showModal();
   }
 
-  function confirmCalendarVacationSelection() {
+  async function confirmCalendarVacationSelection() {
     if (!state.vacationSelectionActive || !canEdit()) return;
     const employeeId = state.currentUser.id;
     const start = state.vacationDraftStart;
@@ -5272,12 +5511,17 @@ function canEdit(showMessage = true) {
     }
     const dialog = $("vacationConfirmDialog");
     if (dialog && dialog.open) dialog.close();
-    addVacationRange(employeeId, start, end);
+    if (!(await confirmShortNoticeIfNeeded(start))) {
+      redoCalendarVacationSelection();
+      return;
+    }
+    if (!addVacationRange(employeeId, start, end)) return;
     state.vacationSelectionActive = false;
     clearVacationDraft();
     state.currentEmployeeId = state.currentUser.id;
     saveLocal();
     render();
+    showVacationSavedGuidance();
   }
 
   function redoCalendarVacationSelection() {
@@ -5290,7 +5534,7 @@ function canEdit(showMessage = true) {
     applyAccessMode();
   }
 
-  function saveVacationFromDates() {
+  async function saveVacationFromDates() {
     if (!canEdit()) return;
     const employeeId = state.currentUser.id;
     const start = toIso($("vacationStartDate").value);
@@ -5309,13 +5553,15 @@ function canEdit(showMessage = true) {
       return;
     }
     state.currentEmployeeId = employeeId;
-    addVacationRange(employeeId, start, end);
+    if (!(await confirmShortNoticeIfNeeded(start))) return;
+    if (!addVacationRange(employeeId, start, end)) return;
     state.selected = null;
     state.vacationSelectionActive = false;
     state.currentEmployeeId = state.currentUser.id;
     $("vacationDialog").close();
     saveLocal();
     render();
+    showVacationSavedGuidance();
   }
 
   function clearEmployeeForm() {
@@ -5465,13 +5711,13 @@ function canEdit(showMessage = true) {
   }
 
   function addVacationRange(employeeId, start, end) {
-    if (!canEdit()) return;
+    if (!canEdit()) return false;
     if (!employeeId || employeeId !== state.currentUser.id) {
       setStatus("As férias só podem ser marcadas para o funcionário que está em modo edição.");
-      return;
+      return false;
     }
     const emp = state.employees.find((e) => e.id === employeeId);
-    if (!emp) return;
+    if (!emp) return false;
     let mergedStart = start;
     let mergedEnd = end;
     const merged = [];
@@ -5509,6 +5755,7 @@ function canEdit(showMessage = true) {
     emp.months = [...new Set(normalizeMonthList(emp.months).concat(monthsBetween(mergedStart, mergedEnd)))];
     audit(merged.length ? "MESCLAR_FERIAS" : "INCLUIR_FERIAS", { employee: emp.name, start: mergedStart, end: mergedEnd, merged });
     setStatus(emp.name + ": " + displayDate(mergedStart) + " até " + displayDate(mergedEnd));
+    return true;
   }
   function monthsBetween(start, end) {
     const result = [];
@@ -6064,6 +6311,17 @@ function canEdit(showMessage = true) {
     $("vacationConfirmDialog").addEventListener("cancel", (event) => {
       event.preventDefault();
       redoCalendarVacationSelection();
+    });
+    $("shortNoticeContinue").addEventListener("click", () => resolveShortNotice(true));
+    $("shortNoticeCancel").addEventListener("click", () => resolveShortNotice(false));
+    $("shortNoticeDialog").addEventListener("cancel", (event) => {
+      event.preventDefault();
+      resolveShortNotice(false);
+    });
+    $("vacationGuidanceClose").addEventListener("click", closeVacationSavedGuidance);
+    $("vacationSavedGuidanceDialog").addEventListener("cancel", (event) => {
+      event.preventDefault();
+      closeVacationSavedGuidance();
     });
     $("vacationSelectionStart").addEventListener("change", () => updateVacationDraftFromFields("start"));
     $("vacationSelectionEnd").addEventListener("change", () => updateVacationDraftFromFields("end"));
