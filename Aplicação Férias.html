@@ -3941,13 +3941,28 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
   function hashToHex(buffer) {
     return Array.from(new Uint8Array(buffer)).map((byte) => byte.toString(16).padStart(2, "0")).join("");
   }
+  function localBufferFingerprint(arrayBuffer) {
+    const bytes = new Uint8Array(arrayBuffer);
+    let hashA = 2166136261;
+    let hashB = 2246822519;
+    for (let index = 0; index < bytes.length; index++) {
+      const byte = bytes[index];
+      hashA ^= byte;
+      hashA = Math.imul(hashA, 16777619);
+      hashB ^= byte + index;
+      hashB = Math.imul(hashB, 3266489917);
+    }
+    return [hashA >>> 0, hashB >>> 0].map((value) => value.toString(16).padStart(8, "0")).join("");
+  }
   async function calculateFingerprint(file, arrayBuffer) {
     const data = arrayBuffer || await file.arrayBuffer();
-    const digest = await crypto.subtle.digest("SHA-256", data.slice(0));
+    const canUseSubtleCrypto = globalThis.crypto && crypto.subtle && typeof crypto.subtle.digest === "function";
     return {
       lastModified: Number(file.lastModified || 0),
       size: Number(file.size || data.byteLength || 0),
-      hash: hashToHex(digest)
+      hash: canUseSubtleCrypto
+        ? hashToHex(await crypto.subtle.digest("SHA-256", data.slice(0)))
+        : localBufferFingerprint(data)
     };
   }
   function sameFingerprint(a, b) {
